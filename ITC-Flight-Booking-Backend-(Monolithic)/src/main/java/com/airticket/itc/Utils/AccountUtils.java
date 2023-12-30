@@ -1,21 +1,8 @@
 package com.airticket.itc.Utils;
 
-import java.time.Year;
 
 public class AccountUtils {
-    static Year currentYear = Year.now();
-    static int min = 100000;
-    static int max = 999999;
 
-    public static String genrateAccountNumber(){
-        int randNumber = (int) Math.floor(Math.random() * ( max - min + 1) + min);
-        String year = String.valueOf(currentYear);
-        String randomNumber = String.valueOf(randNumber);
-        StringBuilder accountNumber = new StringBuilder();
-
-        return accountNumber.append(year).append(randomNumber).toString();
-
-    }
 
     public static final String ACCOUNT_ALREADY_EXISTS_CODE = "001";
     public static final String ACCOUNT_ALREADY_EXISTS_MESSAGE = "Sorry user already exists";
@@ -32,7 +19,7 @@ public class AccountUtils {
     public static final String INSUFFICIENT_BALANCE_CODE = "007";
     public static final String INSUFFICIENT_BALANCE_MESSAGE = "Amount not debited";
     public static final String TRANSFER_SUCCESS_CODE = "008";
-    public static final String TRANSFER_SUCCESS_MESSAGE = "Money transfered successfully";
+    public static final String TRANSFER_SUCCESS_MESSAGE = "Money transferred successfully";
 
 
 }

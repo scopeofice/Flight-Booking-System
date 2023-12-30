@@ -24,9 +24,6 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userid")
     private User user;
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private FlightSchedule flight;
     @ManyToOne
     @JoinColumn(name = "flight_schedule_id", nullable = false)
     @JsonIgnore

@@ -10,5 +10,4 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentInfoRepository extends JpaRepository<PaymentInfo, Integer> {
-    Optional<PaymentInfo> findByBooking(Booking booking);
 }

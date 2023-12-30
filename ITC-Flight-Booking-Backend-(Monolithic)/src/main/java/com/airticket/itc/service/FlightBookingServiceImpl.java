@@ -88,7 +88,7 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 
 		passengerInfoRepository.saveAll(passengerInfoList);
 
-		payment.setBooking(bookingInfo);
+//		payment.setBooking(bookingInfo);
 
 		String pnr = UUID.randomUUID().toString().split("-")[0];
 
@@ -99,7 +99,9 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 
 		pnrDataRepository.save(newPNR);
 
-		flights.get().setAvailableSeats(234);
+		System.out.println(flights.get().toString());
+		flights.get().setAvailableSeats(flights.get().getAvailableSeats() - flightBookingRequest.getPassengerInfoList().size());
+		System.out.println(flights.get().toString());
 		flightsRepository.save(flights.get());
 
 		bookingRepository.save(bookingInfo);
@@ -152,11 +154,10 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 							.gender(passengerDTO.getGender())
 							.build()).collect(Collectors.toList());
 
-					PaymentInfo paymentInfo = paymentInfoRepository.findByBooking(booking).orElseThrow(() -> new BookingNotFoundException("Payment with this booking not found"));
 
 					PaymentDTO paymentDTO = PaymentDTO.builder()
-							.accountNo(paymentInfo.getAccountNo())
-							.totalAmount(paymentInfo.getTotalAmount())
+							.accountNo(booking.getPaymentInfo().getAccountNo())
+							.totalAmount(booking.getPaymentInfo().getTotalAmount())
 							.build();
 					FlightScheduleDTO flightScheduleDTO = FlightScheduleDTO.builder()
 							.flightName(booking.getFlight().getFlight().getFlightName())
@@ -195,11 +196,10 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 					.seatNumber(passengerDTO.getSeatNumber())
 					.gender(passengerDTO.getGender()).build()).collect(Collectors.toList());
 
-			PaymentInfo paymentInfo = paymentInfoRepository.findByBooking(booking).orElseThrow(()->new BookingNotFoundException("Payment with this booking not found"));
 
 			PaymentDTO paymentDTO = PaymentDTO.builder()
-					.accountNo(paymentInfo.getAccountNo())
-					.totalAmount(paymentInfo.getTotalAmount())
+					.accountNo(booking.getPaymentInfo().getAccountNo())
+					.totalAmount(booking.getPaymentInfo().getTotalAmount())
 					.build();
 			FlightScheduleDTO flightScheduleDTO = FlightScheduleDTO.builder()
 					.flightName(booking.getFlight().getFlight().getFlightName())

@@ -17,14 +17,14 @@ import lombok.NoArgsConstructor;
 public class PaymentInfo {
 
 	@Id
-	@GeneratedValue(generator = "uuid2")
-	private int paymentId;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String paymentId;
 	private String accountNo;
 	private double totalAmount;
-	@OneToOne
-	@JoinColumn(name = "booking_id")
-	@JsonIgnore
-	private Booking booking;
+//	@OneToOne
+//	@JoinColumn(name = "booking_id")
+//	@JsonIgnore
+//	private Booking booking;
 
 
 }
