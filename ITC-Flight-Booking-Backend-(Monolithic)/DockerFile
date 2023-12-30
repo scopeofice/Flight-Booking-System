@@ -1,0 +1,4 @@
+FROM openjdk:8
+EXPOSE 8080
+ADD target/flightbooking-transactional.jar flightbooking-transactional.jar
+ENTRYPOINT [ "java","-jar","/flightbooking-transactional.jar" ]
