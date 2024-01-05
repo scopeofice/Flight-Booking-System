@@ -77,8 +77,9 @@ public class FlightServiceImpl implements FlightService {
         flightDTO.setPickupTime(flightSchedule.getTakeoffTime().toString());
         flightDTO.setArrivalTime(flightSchedule.getArrivalTime().toString());
         flightDTO.setFlightName(flightSchedule.getFlight().getFlightName());
-        flightDTO.setAvailableSeat(flightSchedule.getFlight().getAvailableSeats());
         flightDTO.setStatus(flightSchedule.getStatus().toString());
+        flightDTO.setAvailableSeat(flightSchedule.getAvailableSeats());
+        flightDTO.setFare(flightSchedule.getFlight().getFare());
         return flightDTO;
     }
 
@@ -88,7 +89,6 @@ public class FlightServiceImpl implements FlightService {
                 .flightName(flightDTO.getFlightName().toUpperCase())
                 .numberOfSeats(flightDTO.getNumberOfSeats())
                 .fare(flightDTO.getFare())
-                .availableSeats(flightDTO.getNumberOfSeats())
                 .build();
         flightsRepository.save(newFlight);
         return "Flight added Successfully";
@@ -107,6 +107,7 @@ public class FlightServiceImpl implements FlightService {
                 .flight(flight)
                 .source(scheduleDTO.getSource().toUpperCase())
                 .status(Status.STATUS_ACTIVE)
+                .availableSeats(flight.getNumberOfSeats())
                 .destination(scheduleDTO.getDestination().toUpperCase())
                 .travelDate(LocalDate.parse(scheduleDTO.getTravelDate(), DateTimeFormatter.ofPattern("MM/dd/yyyy")))
                 .takeoffTime(LocalTime.parse(scheduleDTO.getPickupTime()))
@@ -146,6 +147,7 @@ public class FlightServiceImpl implements FlightService {
         }
         existingSchedule.setSource(scheduleDTO.getSource().toUpperCase());
         existingSchedule.setDestination(scheduleDTO.getDestination().toUpperCase());
+        existingSchedule.setAvailableSeats(scheduleDTO.getAvailableSeats());
         existingSchedule.setFlight(flightsRepository.findByFlightName(scheduleDTO.getFlightName().toUpperCase()).orElseThrow(()->new FlightNotFoundException("No flight with name "+scheduleDTO.getFlightName()+" found")));
         if(scheduleDTO.getStatus().equalsIgnoreCase("inactive")){
             existingSchedule.setStatus(Status.STATUS_INACTIVE);

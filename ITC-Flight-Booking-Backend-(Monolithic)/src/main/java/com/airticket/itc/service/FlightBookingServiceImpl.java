@@ -2,15 +2,13 @@ package com.airticket.itc.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.airticket.itc.dto.*;
 import com.airticket.itc.entity.*;
 import com.airticket.itc.exception.BookingException;
+import com.airticket.itc.exception.TransactionFailedException;
 import com.airticket.itc.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import com.airticket.itc.exception.BookingNotFoundException;
@@ -47,13 +45,23 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 	@Override
 	public FlightBookingAcknowledgement bookFlightTicket(BookingDTO flightBookingRequest) {
 		FlightSchedule flightSchedule = flightScheduleRepository.findByScheduleCode(flightBookingRequest.getScheduleCode()).get();
-		Optional<Flights> flights = flightsRepository.findByFlightName(flightSchedule.getFlight().getFlightName());
 
-		if(flightBookingRequest.getPassengerInfoList().size() > flights.get().getAvailableSeats()){
+		if(flightBookingRequest.getPassengerInfoList().size() > flightSchedule.getAvailableSeats()){
 			throw  new BookingException("Seats not available");
 		} else if (flightSchedule.getStatus().equals(Status.STATUS_INACTIVE)) {
 			throw new BookingException("Flight cannot be booked");
 		}else {
+
+			Set<Integer> seatNumberSet = new HashSet<>();
+
+			List<Booking> bookingList = bookingRepository.findByFlight(flightSchedule);
+			for(Booking booking : bookingList){
+				List<PassengerInfo> passengers = booking.getPassengerInfoList();
+				for(PassengerInfo passengerInfo : passengers){
+					seatNumberSet.add(passengerInfo.getSeatNumber());
+				}
+			}
+
 
 		List<PassengerInfo> passengerInfoList = flightBookingRequest.getPassengerInfoList().stream()
 				.map(passengerDTO -> PassengerInfo.builder()
@@ -65,6 +73,17 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 						.build())
 				.collect(Collectors.toList());
 
+			int totalSeats = flightSchedule.getFlight().getNumberOfSeats();
+			for (PassengerInfo passenger: passengerInfoList) {
+				int seatNumb = passenger.getSeatNumber();
+				if(seatNumb < 1 || seatNumb > totalSeats){
+					throw new BookingException("Seat number should be in the range of 1 - "+totalSeats);
+				}
+				if(!seatNumberSet.add(seatNumb)){
+					throw new BookingException("Seat already booked");
+				}
+			}
+
 		Optional<User> currentUser = userRepo.findByEmail(flightBookingRequest.getEmail());
 
 
@@ -73,7 +92,13 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 				.totalAmount(flightBookingRequest.getPaymentInfo().getTotalAmount())
 				.build();
 
-		PaymentInfo paymentInfo = paymentInfoRepository.save(payment);
+		if(payment.getTotalAmount() == flightSchedule.getFlight().getFare() * passengerInfoList.size()){
+			paymentInfoRepository.save(payment);
+		}
+		else {
+			throw new TransactionFailedException("Wrong Amount");
+		}
+
 
 		Booking bookingInfo = Booking.builder()
 				.flight(flightSchedule)
@@ -81,14 +106,12 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 				.bookingDate(LocalDate.now())
 				.bookingTime(LocalTime.now())
 				.passengerInfoList(passengerInfoList)
-				.paymentInfo(paymentInfo)
+				.paymentInfo(payment)
 				.build();
 
 		passengerInfoList.forEach(passengerInfo -> passengerInfo.setBooking(bookingInfo));
 
 		passengerInfoRepository.saveAll(passengerInfoList);
-
-//		payment.setBooking(bookingInfo);
 
 		String pnr = UUID.randomUUID().toString().split("-")[0];
 
@@ -99,10 +122,8 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 
 		pnrDataRepository.save(newPNR);
 
-		System.out.println(flights.get().toString());
-		flights.get().setAvailableSeats(flights.get().getAvailableSeats() - flightBookingRequest.getPassengerInfoList().size());
-		System.out.println(flights.get().toString());
-		flightsRepository.save(flights.get());
+		flightSchedule.setAvailableSeats(flightSchedule.getAvailableSeats()-flightBookingRequest.getPassengerInfoList().size());
+		flightScheduleRepository.save(flightSchedule);
 
 		bookingRepository.save(bookingInfo);
 
@@ -118,6 +139,8 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 		);
 		}
 	}
+
+
 
 	@Override
 	public FlightBookingAcknowledgement bookingDetailsByPNR(String pnr){

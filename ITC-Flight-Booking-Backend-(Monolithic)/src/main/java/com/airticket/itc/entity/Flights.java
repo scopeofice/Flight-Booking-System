@@ -19,7 +19,6 @@ public class Flights {
         @Column(unique = true)
         private String flightName;
         private int numberOfSeats;
-        private int availableSeats;
         private double fare;
 
 }

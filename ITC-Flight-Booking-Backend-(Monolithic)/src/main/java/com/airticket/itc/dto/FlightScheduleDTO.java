@@ -17,6 +17,7 @@ public class FlightScheduleDTO {
     private String pickupTime;
     private String arrivalTime;
     private String flightName;
+    private double fare;
     private String status;
     private int availableSeat;
 }

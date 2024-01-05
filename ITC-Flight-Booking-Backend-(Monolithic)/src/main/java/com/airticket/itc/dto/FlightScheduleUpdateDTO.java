@@ -18,4 +18,5 @@ public class FlightScheduleUpdateDTO {
     private String arrivalTime;
     private String flightName;
     private String status;
+    private int availableSeats;
 }

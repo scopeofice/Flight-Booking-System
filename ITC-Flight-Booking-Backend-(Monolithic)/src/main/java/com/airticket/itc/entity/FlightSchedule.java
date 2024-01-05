@@ -31,6 +31,7 @@ public class FlightSchedule {
         @ManyToOne
         @JoinColumn(name = "flight_id", nullable = false)
         private Flights flight;
+        private int availableSeats;
 
         private String source;
         private String destination;
