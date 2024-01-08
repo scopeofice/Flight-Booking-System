@@ -15,11 +15,12 @@ public interface FlightService {
     List<FlightScheduleDTO> getFlightDetailsByFlightName(String name) throws FlightScheduleNotFoundException;
     List<FlightScheduleDTO> getFlightDetailsBySourceDestinationAndTravelDate(String source, String destination, String travelDate) throws FlightScheduleNotFoundException;
     List<FlightScheduleDTO> getAllFlightDetails();
+    List<FlightsDTO> getAllFlights();
+    FlightsDTO updateFlight(FlightsDTO flight);
     String addFlight(FlightsDTO flightDTO);
     String deleteFlight(String flightName) throws FlightScheduleNotFoundException;
     String addFlightSchedule(FlightScheduleCreateDTO scheduleDTO) throws FlightNotFoundException;
     String deleteFlightSchedule(String code) throws FlightScheduleNotFoundException;
-    FlightsDTO updateFlight(FlightsDTO flight);
     FlightScheduleDTO updateFlightSchedule(FlightScheduleUpdateDTO scheduleDTO) throws FlightScheduleNotFoundException, FlightNotFoundException;
 
 }

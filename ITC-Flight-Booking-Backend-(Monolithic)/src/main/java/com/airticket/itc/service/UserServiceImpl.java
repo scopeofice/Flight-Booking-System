@@ -4,9 +4,11 @@ package com.airticket.itc.service;
 import com.airticket.itc.Utils.AccountUtils;
 import com.airticket.itc.config.JwtTokenProvider;
 import com.airticket.itc.dto.*;
+import com.airticket.itc.entity.OTP;
 import com.airticket.itc.entity.Role;
 import com.airticket.itc.entity.User;
 import com.airticket.itc.exception.UserNotFoundException;
+import com.airticket.itc.repository.OTPrepo;
 import com.airticket.itc.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +34,8 @@ public class UserServiceImpl implements UserService {
     JwtTokenProvider jwtTokenProvider;
     @Autowired
     EmailService emailService;
+    @Autowired
+    OTPrepo otPrepo;
 
     @Override
     public AuthResponse createAccount(UserRequestDTO userRequest) {
@@ -53,6 +57,12 @@ public class UserServiceImpl implements UserService {
                     .status("ACTIVE")
                     .build();
             User savedUser = userRepo.save(newUser);
+
+            OTP newUserOTP = OTP.builder()
+                    .otp(AccountUtils.generateOTP())
+                    .email(newUser.getEmail())
+                    .build();
+            otPrepo.save(newUserOTP);
 
             EmailDTO emailDetails = EmailDTO.builder()
                     .recipient(savedUser.getEmail())

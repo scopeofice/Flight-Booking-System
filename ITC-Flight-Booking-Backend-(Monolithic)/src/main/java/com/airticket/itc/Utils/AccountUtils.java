@@ -1,8 +1,15 @@
 package com.airticket.itc.Utils;
 
 
+import java.util.Random;
+
 public class AccountUtils {
 
+    public static String generateOTP() {
+        Random random = new Random();
+        int randomNumber = 1000 + random.nextInt(9000);
+        return String.valueOf(randomNumber);
+    }
 
     public static final String ACCOUNT_ALREADY_EXISTS_CODE = "001";
     public static final String ACCOUNT_ALREADY_EXISTS_MESSAGE = "Sorry user already exists";

@@ -33,10 +33,13 @@ public class FlightController {
         return flightService.getFlightDetailsBySourceDestinationAndTravelDate(source, destination, travelDate);
     }
 
-    @GetMapping("/all")
-    public List<FlightScheduleDTO> getAllFlightDetails() {
+    @GetMapping("/schedule/all")
+    public List<FlightScheduleDTO> getAllFlightScheduleDetails() {
         return flightService.getAllFlightDetails();
     }
+
+    @GetMapping("/all")
+    public List<FlightsDTO> getAllFlightDetails(){ return flightService.getAllFlights(); }
 
     @PostMapping("/addFlight")
     public ResponseEntity<String> addFlight(@RequestBody FlightsDTO flightDTO) {
@@ -61,9 +64,14 @@ public class FlightController {
         String resp = flightService.deleteFlightSchedule(code);
         return new ResponseEntity<>(resp,HttpStatus.NO_CONTENT);
     }
-    @PutMapping("/updateFlightSchedule/{scheduleId}")
+    @PutMapping("/updateFlightSchedule")
     public ResponseEntity<FlightScheduleDTO> updateFlightSchedule(@RequestBody FlightScheduleUpdateDTO scheduleDTO) throws FlightScheduleNotFoundException, FlightNotFoundException {
         FlightScheduleDTO updatedSchedule = flightService.updateFlightSchedule(scheduleDTO);
         return new ResponseEntity<>(updatedSchedule, HttpStatus.OK);
+    }
+    @PutMapping("/updateFlight")
+    public ResponseEntity<FlightsDTO> updateFlight(@RequestBody FlightsDTO flightsDTO){
+        FlightsDTO updatedFlight = flightService.updateFlight(flightsDTO);
+        return new ResponseEntity<>(updatedFlight,HttpStatus.OK);
     }
 }

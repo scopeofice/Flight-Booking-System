@@ -24,6 +24,7 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userid")
     private User user;
+    private Status status;
     @ManyToOne
     @JoinColumn(name = "flight_schedule_id", nullable = false)
     @JsonIgnore
@@ -34,9 +35,10 @@ public class Booking {
     @OneToOne(cascade = CascadeType.ALL)
     @JsonIgnore
     private PaymentInfo paymentInfo;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate bookingDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime bookingTime;
+
 
 }

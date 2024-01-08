@@ -1,5 +1,6 @@
 package com.airticket.itc.controller;
 
+import com.airticket.itc.dto.BookingCancelDTO;
 import com.airticket.itc.dto.BookingDTO;
 import com.airticket.itc.dto.BookingResponseDTO;
 import com.airticket.itc.dto.FlightBookingAcknowledgement;
@@ -28,11 +29,15 @@ public class BookingController {
     }
 
     @GetMapping("/bookingDetailsById/{bookingId}")
-    public BookingResponseDTO bookingDetailsById(@PathVariable Long bookingId) {
+    public BookingResponseDTO bookingDetailsById(@PathVariable String bookingId) {
         return flightBookingService.bookingDetailsById(bookingId);
     }
+    @PutMapping("/updateBookingDetails/{bookingId}")
+    public String updateBookingDetails(@PathVariable String bookingId, @RequestBody BookingDTO booking){
+        return flightBookingService.updateBookings(bookingId,booking);
+    }
 
-    @GetMapping("/user/{userEmail}")
+    @GetMapping("/userBooking/{userEmail}")
     public ResponseEntity<List<BookingResponseDTO>> getUserBookings(@PathVariable String userEmail) {
         List<BookingResponseDTO> userBookings = flightBookingService.userBookings(userEmail);
         if (!userBookings.isEmpty()) {
@@ -41,4 +46,11 @@ public class BookingController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping("/cancelBooking")
+    public ResponseEntity<String> cancelUserBooking(@RequestBody BookingCancelDTO cancelRequest){
+        return new ResponseEntity<>(flightBookingService.cancelBooking(cancelRequest),HttpStatus.OK);
+    }
+
+
 }

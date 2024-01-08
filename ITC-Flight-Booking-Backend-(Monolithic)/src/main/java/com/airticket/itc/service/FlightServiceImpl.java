@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +45,7 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public List<FlightScheduleDTO> getFlightDetailsBySourceDestinationAndTravelDate(
             String source, String destination, String travelDate) throws FlightScheduleNotFoundException {
-        LocalDate parsedTravelDate = LocalDate.parse(travelDate, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        LocalDate parsedTravelDate = LocalDate.parse(travelDate);
         List<FlightSchedule> flightSchedules = flightScheduleRepository
                 .findBySourceAndDestinationAndTravelDate(source, destination, parsedTravelDate);
         List<FlightScheduleDTO> activeFlights = flightSchedules.stream().filter(a->a.getStatus().equals(Status.STATUS_ACTIVE))
@@ -109,7 +108,7 @@ public class FlightServiceImpl implements FlightService {
                 .status(Status.STATUS_ACTIVE)
                 .availableSeats(flight.getNumberOfSeats())
                 .destination(scheduleDTO.getDestination().toUpperCase())
-                .travelDate(LocalDate.parse(scheduleDTO.getTravelDate(), DateTimeFormatter.ofPattern("MM/dd/yyyy")))
+                .travelDate(LocalDate.parse(scheduleDTO.getTravelDate()))
                 .takeoffTime(LocalTime.parse(scheduleDTO.getPickupTime()))
                 .arrivalTime(LocalTime.parse(scheduleDTO.getArrivalTime()))
                 .build();
@@ -127,11 +126,28 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
+    public List<FlightsDTO> getAllFlights() {
+        List<Flights> allFlights = flightsRepository.findAll();
+
+        return allFlights.stream().map(flights -> FlightsDTO.builder()
+                .numberOfSeats(flights.getNumberOfSeats())
+                .flightName(flights.getFlightName())
+                .fare(flights.getFare())
+                .build()).collect(Collectors.toList());
+    }
+
+    @Override
     public FlightsDTO updateFlight(FlightsDTO flight) {
         if(flightsRepository.existsByFlightName(flight.getFlightName())){
-            Flights updateFlight = flightsRepository.findByFlightName(flight.getFlightName()).get();
-            updateFlight.setFare(flight.getFare());
-            updateFlight.setNumberOfSeats(flight.getNumberOfSeats());
+            Flights updatedFlight = flightsRepository.findByFlightName(flight.getFlightName()).get();
+            updatedFlight.setFare(flight.getFare());
+            updatedFlight.setNumberOfSeats(flight.getNumberOfSeats());
+            flightsRepository.save(updatedFlight);
+            return FlightsDTO.builder()
+                    .flightName(flight.getFlightName())
+                    .fare(flight.getFare())
+                    .numberOfSeats(flight.getNumberOfSeats())
+                    .build();
         }
         return null;
     }
@@ -156,7 +172,7 @@ public class FlightServiceImpl implements FlightService {
         }else {
             throw new FlightScheduleNotFoundException("Invalid status entered");
         }
-        existingSchedule.setTravelDate(LocalDate.parse(scheduleDTO.getTravelDate(), DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+        existingSchedule.setTravelDate(LocalDate.parse(scheduleDTO.getTravelDate()));
         existingSchedule.setTakeoffTime(LocalTime.parse(scheduleDTO.getPickupTime()));
         existingSchedule.setArrivalTime(LocalTime.parse(scheduleDTO.getArrivalTime()));
 

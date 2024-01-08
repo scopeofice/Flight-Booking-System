@@ -11,11 +11,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingResponseDTO {
-    private String bookingId;
-    private String status;
-    private FlightScheduleDTO schedule;
-    private String email;
+public class BookingUpdateDTO {
     private List<PassengerDTO> passengerInfoList;
-    private PaymentResponseDTO paymentInfo;
 }
