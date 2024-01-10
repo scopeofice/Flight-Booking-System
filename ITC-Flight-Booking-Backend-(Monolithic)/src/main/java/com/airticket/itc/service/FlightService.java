@@ -6,6 +6,8 @@ import com.airticket.itc.dto.FlightScheduleCreateDTO;
 import com.airticket.itc.dto.FlightScheduleUpdateDTO;
 import com.airticket.itc.dto.FlightsDTO;
 import com.airticket.itc.dto.FlightScheduleDTO;
+import com.airticket.itc.exception.FlightAlreadyExistsException;
+import com.airticket.itc.exception.FlightNameingException;
 import com.airticket.itc.exception.FlightNotFoundException;
 import com.airticket.itc.exception.FlightScheduleNotFoundException;
 
@@ -17,7 +19,7 @@ public interface FlightService {
     List<FlightScheduleDTO> getAllFlightDetails();
     List<FlightsDTO> getAllFlights();
     FlightsDTO updateFlight(FlightsDTO flight);
-    String addFlight(FlightsDTO flightDTO);
+    String addFlight(FlightsDTO flightDTO) throws FlightAlreadyExistsException, FlightNameingException;
     String deleteFlight(String flightName) throws FlightScheduleNotFoundException;
     String addFlightSchedule(FlightScheduleCreateDTO scheduleDTO) throws FlightNotFoundException;
     String deleteFlightSchedule(String code) throws FlightScheduleNotFoundException;

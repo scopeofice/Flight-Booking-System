@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
                         .lastName(foundUser.get().getLastName())
                         .email(foundUser.get().getEmail())
                         .phoneNumber(foundUser.get().getPhoneNumber())
+                        .role(foundUser.get().getRole().toString())
                         .build())
                 .build();
 

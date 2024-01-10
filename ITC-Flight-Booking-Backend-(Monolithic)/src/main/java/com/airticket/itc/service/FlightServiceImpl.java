@@ -5,12 +5,9 @@ import com.airticket.itc.dto.FlightScheduleCreateDTO;
 import com.airticket.itc.dto.FlightScheduleUpdateDTO;
 import com.airticket.itc.dto.FlightsDTO;
 import com.airticket.itc.dto.FlightScheduleDTO;
-import com.airticket.itc.entity.FlightSchedule;
-import com.airticket.itc.entity.Flights;
-import com.airticket.itc.entity.Status;
-import com.airticket.itc.exception.FlightNotFoundException;
-import com.airticket.itc.exception.FlightScheduleNotFoundException;
-import com.airticket.itc.exception.FlightScheduleUpdateException;
+import com.airticket.itc.entity.*;
+import com.airticket.itc.exception.*;
+import com.airticket.itc.repository.BookingRepository;
 import com.airticket.itc.repository.FlightScheduleRepository;
 import com.airticket.itc.repository.FlightsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +28,8 @@ public class FlightServiceImpl implements FlightService {
     private FlightScheduleRepository flightScheduleRepository;
     @Autowired
     private FlightsRepository flightsRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Override
     public List<FlightScheduleDTO> getFlightDetailsByFlightName(String flightName) throws FlightScheduleNotFoundException {
@@ -79,13 +81,40 @@ public class FlightServiceImpl implements FlightService {
         flightDTO.setStatus(flightSchedule.getStatus().toString());
         flightDTO.setAvailableSeat(flightSchedule.getAvailableSeats());
         flightDTO.setFare(flightSchedule.getFlight().getFare());
+        int totalSeats = flightSchedule.getFlight().getNumberOfSeats();
+        Set<Integer> bookedSeats = new HashSet<>();
+
+        List<Booking> bookings = bookingRepository.findByFlight(flightSchedule);
+        for (Booking booking : bookings) {
+            for (PassengerInfo passengerInfo : booking.getPassengerInfoList()) {
+                bookedSeats.add(passengerInfo.getSeatNumber());
+            }
+        }
+        List<Integer> availableSeats = new ArrayList<>();
+        for (int seatNumber = 1; seatNumber <= totalSeats; seatNumber++) {
+            if (!bookedSeats.contains(seatNumber)) {
+                availableSeats.add(seatNumber);
+            }
+        }
+
+        flightDTO.setAvailableSeats(availableSeats);
         return flightDTO;
     }
 
     @Override
-    public String addFlight(FlightsDTO flightDTO) {
+    public String addFlight(FlightsDTO flightDTO) throws FlightAlreadyExistsException, FlightNameingException {
+        if(flightsRepository.existsByFlightName(flightDTO.getFlightName())){
+            throw new FlightAlreadyExistsException("Flight with name "+flightDTO.getFlightName()+" already exists");
+        } else if (flightDTO.getFlightName() == "") {
+            throw new FlightNameingException("Flight name cannot be blank");
+        }
+        if(flightDTO.getAirlineName() == "")
+        {
+            throw new FlightNameingException("Airline name cannot be blank");
+        }
         Flights newFlight = Flights.builder()
                 .flightName(flightDTO.getFlightName().toUpperCase())
+                .airlineName(flightDTO.getAirlineName())
                 .numberOfSeats(flightDTO.getNumberOfSeats())
                 .fare(flightDTO.getFare())
                 .build();
@@ -132,6 +161,7 @@ public class FlightServiceImpl implements FlightService {
         return allFlights.stream().map(flights -> FlightsDTO.builder()
                 .numberOfSeats(flights.getNumberOfSeats())
                 .flightName(flights.getFlightName())
+                .airlineName((flights.getAirlineName()))
                 .fare(flights.getFare())
                 .build()).collect(Collectors.toList());
     }
@@ -142,10 +172,12 @@ public class FlightServiceImpl implements FlightService {
             Flights updatedFlight = flightsRepository.findByFlightName(flight.getFlightName()).get();
             updatedFlight.setFare(flight.getFare());
             updatedFlight.setNumberOfSeats(flight.getNumberOfSeats());
+            updatedFlight.setAirlineName(flight.getAirlineName());
             flightsRepository.save(updatedFlight);
             return FlightsDTO.builder()
                     .flightName(flight.getFlightName())
                     .fare(flight.getFare())
+                    .airlineName(flight.getAirlineName())
                     .numberOfSeats(flight.getNumberOfSeats())
                     .build();
         }
@@ -158,8 +190,13 @@ public class FlightServiceImpl implements FlightService {
                 new FlightScheduleNotFoundException("Flight schedule with ID " + scheduleDTO.getScheduleCode() + " not found"));
         if(existingSchedule.getTravelDate().isBefore(LocalDate.now())){
             throw new FlightScheduleUpdateException("Flight can not be updated, Flight already landed");
-        } else if (existingSchedule.getArrivalTime().isBefore(LocalTime.now())) {
+        } else if(existingSchedule.getTravelDate().equals(LocalDate.now()) && existingSchedule.getArrivalTime().isBefore(LocalTime.now())){
             throw new FlightScheduleUpdateException("Flight can not be updated, Flight already landed");
+        }
+        System.out.println(existingSchedule.getAvailableSeats());
+        System.out.println(flightsRepository.findByFlightName(existingSchedule.getFlight().getFlightName()).get().getNumberOfSeats());
+        if(existingSchedule.getAvailableSeats() > flightsRepository.findByFlightName(existingSchedule.getFlight().getFlightName()).get().getNumberOfSeats()){
+            throw new FlightScheduleUpdateException("Available seats cannot be more than the total flight seats");
         }
         existingSchedule.setSource(scheduleDTO.getSource().toUpperCase());
         existingSchedule.setDestination(scheduleDTO.getDestination().toUpperCase());

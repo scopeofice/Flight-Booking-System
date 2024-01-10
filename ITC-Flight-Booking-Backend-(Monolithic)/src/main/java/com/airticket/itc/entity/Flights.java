@@ -18,6 +18,7 @@ public class Flights {
         private Long flightId;
         @Column(unique = true)
         private String flightName;
+        private String airlineName;
         private int numberOfSeats;
         private double fare;
 

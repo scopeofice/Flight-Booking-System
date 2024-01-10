@@ -24,3 +24,164 @@
     background-color: #e0e0e0;
   }
   
+
+.search-form,
+.pnr-form {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.search-form input,
+.pnr-form input,
+.search-form button,
+.pnr-form button {
+  margin-right: 10px;
+}
+
+.flight-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.flight-table th,
+.flight-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.flight-table th {
+  background-color: #f2f2f2;
+}
+
+.parent{
+  display: flex;
+}
+
+.info-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Add additional styles for PNR details cards if needed */
+.booking-details-container {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 10px;
+  
+}
+.flight-schedule{
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+}
+.booking-section, .schedule-section {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+}
+p{
+  text-align: left;
+  display: flex;
+  justify-content: center;
+}
+
+.booking-section fieldset, .schedule-section table {
+  width: 100%;
+  border: none;
+}
+
+.booking-section legend, .schedule-section th {
+  /* background-color: #f2f2f2; */
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.passenger-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+
+/* Add any global styles here */
+
+.parent {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px;
+}
+
+.info-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.booking-details-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 10px;
+}
+
+
+.booking-section,
+.schedule-section {
+  box-sizing: border-box;
+  width: 48%;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.booking-section fieldset,
+.schedule-section table {
+  width: 100%;
+  border: none;
+}
+
+.booking-section legend,
+.schedule-section th {
+  background-color: #f2f2f2;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.passenger-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+
+/* Additional styles for PNR details cards */
+.pnr-details-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 10px;
+}
+
+.pnr-details-card div {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 10px;
+}
+
+.pnr-details-card p {
+  text-align: left;
+  margin: 5px 0;
+}

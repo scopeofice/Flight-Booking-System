@@ -23,6 +23,9 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 	private BookingRepository bookingRepository;
 
 	@Autowired
+	EmailService emailService;
+
+	@Autowired
 	private PassengerInfoRepository passengerInfoRepository;
 
 	@Autowired
@@ -46,6 +49,7 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 
 	@Override
 	public FlightBookingAcknowledgement bookFlightTicket(BookingDTO flightBookingRequest) {
+		System.out.println(flightBookingRequest.toString());
 		FlightSchedule flightSchedule = flightScheduleRepository.findByScheduleCode(flightBookingRequest.getScheduleCode()).get();
 
 		if (flightBookingRequest.getPassengerInfoList().size() > flightSchedule.getAvailableSeats()) {
@@ -129,41 +133,85 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 
 			bookingRepository.save(bookingInfo);
 
+			FlightBookingAcknowledgement acknowledgement = FlightBookingAcknowledgement.builder()
+					.status("SUCCESS")
+					.totalFare(bookingInfo.getPaymentInfo().getTotalAmount())
+					.pnrNo(pnr)
+					.passengerInfo(passengerInfoList.stream().map(passenger -> PassengerDTO.builder()
+							.age(passenger.getAge())
+							.seatNumber(passenger.getSeatNumber())
+							.lastName(passenger.getLastName())
+							.firstName(passenger.getFirstName())
+							.gender(passenger.getGender())
+							.build()).collect(Collectors.toList()))
+					.build();
 
-			return new FlightBookingAcknowledgement(
-					"SUCCESS", bookingInfo.getPaymentInfo().getTotalAmount(), pnr, passengerInfoList.stream().map(passenger -> PassengerDTO.builder()
-					.age(passenger.getAge())
-					.seatNumber(passenger.getSeatNumber())
-					.lastName(passenger.getLastName())
-					.firstName(passenger.getFirstName())
-					.gender(passenger.getGender())
-					.build()).collect(Collectors.toList())
-			);
+			EmailDTO emailDTO = new EmailDTO();
+
+			EmailDTO emailDetails = EmailDTO.builder()
+					.recipient(flightBookingRequest.getEmail())
+					.subject("Flight Tickets")
+					.messageBody(emailDTO.constructBookingAcknowledgementEmail(acknowledgement))
+					.build();
+			emailService.sendEmailAlert(emailDetails);
+
+			return acknowledgement;
 		}
 	}
 
 
 	@Override
-	public FlightBookingAcknowledgement bookingDetailsByPNR(String pnr) {
+	public PNRResponseDTO bookingDetailsByPNR(String pnr) {
 		if (pnrDataRepository.existsByPNR(pnr)) {
-			PNRData pnrData = pnrDataRepository.findByPNR(pnr).orElseThrow(() -> new InvalidPNRNumberException("Wrong PNR number entered"));
-			String status = "SUCCESSFULLY BOOKED";
-			if(pnrData.getBooking().getStatus().equals(Status.STATUS_INACTIVE)){
+			PNRData pnrData = pnrDataRepository.findByPNR(pnr)
+					.orElseThrow(() -> new InvalidPNRNumberException("Wrong PNR number entered"));
+			String status = "SUCCESS";
+			if (pnrData.getBooking().getStatus().equals(Status.STATUS_INACTIVE)) {
 				status = "BOOKING CANCELLED";
 			}
-			return new FlightBookingAcknowledgement(
-					status, pnrData.getBooking().getPaymentInfo().getTotalAmount(), pnr, pnrData.getBooking().getPassengerInfoList().stream().map(passenger -> PassengerDTO.builder()
-					.age(passenger.getAge())
-					.seatNumber(passenger.getSeatNumber())
-					.lastName(passenger.getLastName())
-					.firstName(passenger.getFirstName())
-					.gender(passenger.getGender())
-					.build()).collect(Collectors.toList())
+			Booking userBooking = bookingRepository.findByBookingId(pnrData.getBooking().getBookingId())
+					.orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + pnrData.getBooking().getBookingId()));
+
+			FlightScheduleCreateDTO flightScheduleDTO = FlightScheduleCreateDTO.builder()
+					.flightName(userBooking.getFlight().getFlight().getFlightName())
+					.source(userBooking.getFlight().getSource())
+					.destination(userBooking.getFlight().getDestination())
+					.arrivalTime(userBooking.getFlight().getArrivalTime().toString())
+					.pickupTime(userBooking.getFlight().getTakeoffTime().toString())
+					.travelDate(userBooking.getFlight().getTravelDate().toString())
+					.build();
+
+			List<PassengerInfo> passengerInfoList = passengerInfoRepository.findAllByBooking(userBooking);
+			List<PassengerDTO> passengerDTOList = passengerInfoList.stream()
+					.map(passengerDTO -> PassengerDTO.builder()
+							.firstName(passengerDTO.getFirstName())
+							.lastName(passengerDTO.getLastName())
+							.age(passengerDTO.getAge())
+							.seatNumber(passengerDTO.getSeatNumber())
+							.gender(passengerDTO.getGender())
+							.build())
+					.collect(Collectors.toList());
+
+			PaymentResponseDTO paymentDTO = PaymentResponseDTO.builder()
+					.paymentId(userBooking.getPaymentInfo().getPaymentId())
+					.accountNo(userBooking.getPaymentInfo().getAccountNo())
+					.totalAmount(userBooking.getPaymentInfo().getTotalAmount())
+					.build();
+
+			return new PNRResponseDTO(
+					userBooking.getBookingId(),
+					status,
+					userBooking.getBookingDate().toString(),
+					userBooking.getBookingTime().toString(),
+					flightScheduleDTO,
+					passengerDTOList,
+					paymentDTO
 			);
 		} else {
-			return new FlightBookingAcknowledgement("FAILED", 0.0, null, null);
+			return new PNRResponseDTO(null, "FAILED", null, null, null, null, null);
 		}
 	}
+
 
 	@Override
 	public List<BookingResponseDTO> userBookings(String userEmail) {
@@ -199,9 +247,13 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 						.travelDate(booking.getFlight().getTravelDate().toString())
 						.availableSeat(booking.getFlight().getFlight().getNumberOfSeats())
 						.build();
+				PNRData userPNR = pnrDataRepository.findByBooking(booking).orElseThrow(()->new InvalidPNRNumberException("Booking PNR missing."));
 
 				return BookingResponseDTO.builder()
 						.bookingId(booking.getBookingId())
+						.pnr(userPNR.getPNR())
+						.bookingDate(booking.getBookingDate().toString())
+						.bookingTime(booking.getBookingTime().toString())
 						.status(booking.getStatus().toString())
 						.schedule(flightScheduleDTO)
 						.email(userEmail)
@@ -240,8 +292,13 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 					.availableSeat(booking.getFlight().getFlight().getNumberOfSeats())
 					.build();
 
+			PNRData userPNR = pnrDataRepository.findByBooking(booking).orElseThrow(()->new InvalidPNRNumberException("Booking PNR missing."));
+
 			BookingResponseDTO bookingDTO = BookingResponseDTO.builder()
 					.bookingId(booking.getBookingId())
+					.pnr(userPNR.getPNR())
+					.bookingDate(booking.getBookingDate().toString())
+					.bookingTime(booking.getBookingTime().toString())
 					.status(booking.getStatus().toString())
 					.schedule(flightScheduleDTO)
 					.passengerInfoList(passengerDTOList)
@@ -249,7 +306,7 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 					.build();
 			return bookingDTO;
 		} else {
-			return new BookingResponseDTO(null,null, null, null, null, null);
+			return new BookingResponseDTO(null,null,null,null, null, null, null, null,null);
 		}
 	}
 

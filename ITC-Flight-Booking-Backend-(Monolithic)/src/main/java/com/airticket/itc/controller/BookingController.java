@@ -1,9 +1,6 @@
 package com.airticket.itc.controller;
 
-import com.airticket.itc.dto.BookingCancelDTO;
-import com.airticket.itc.dto.BookingDTO;
-import com.airticket.itc.dto.BookingResponseDTO;
-import com.airticket.itc.dto.FlightBookingAcknowledgement;
+import com.airticket.itc.dto.*;
 import com.airticket.itc.service.FlightBookingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +21,7 @@ public class BookingController {
         return flightBookingService.bookFlightTicket(request);
     }
     @GetMapping("/bookingDetailsByPNR/{pnr}")
-    public FlightBookingAcknowledgement bookingDetailsByPNR(@PathVariable String pnr) {
+    public PNRResponseDTO bookingDetailsByPNR(@PathVariable String pnr) {
         return flightBookingService.bookingDetailsByPNR(pnr);
     }
 

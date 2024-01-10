@@ -4,6 +4,8 @@ import com.airticket.itc.dto.FlightScheduleCreateDTO;
 import com.airticket.itc.dto.FlightScheduleUpdateDTO;
 import com.airticket.itc.dto.FlightsDTO;
 import com.airticket.itc.dto.FlightScheduleDTO;
+import com.airticket.itc.exception.FlightAlreadyExistsException;
+import com.airticket.itc.exception.FlightNameingException;
 import com.airticket.itc.exception.FlightNotFoundException;
 import com.airticket.itc.exception.FlightScheduleNotFoundException;
 import com.airticket.itc.service.FlightService;
@@ -42,7 +44,7 @@ public class FlightController {
     public List<FlightsDTO> getAllFlightDetails(){ return flightService.getAllFlights(); }
 
     @PostMapping("/addFlight")
-    public ResponseEntity<String> addFlight(@RequestBody FlightsDTO flightDTO) {
+    public ResponseEntity<String> addFlight(@RequestBody FlightsDTO flightDTO) throws FlightNameingException, FlightAlreadyExistsException {
         String addedFlight = flightService.addFlight(flightDTO);
         return new ResponseEntity<>(addedFlight, HttpStatus.CREATED);
     }
@@ -59,7 +61,7 @@ public class FlightController {
         return new ResponseEntity<>(addedSchedule, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/deleteFlightSchedule/{scheduleId}")
+    @DeleteMapping("/deleteFlightSchedule/{code}")
     public ResponseEntity<String > deleteFlightSchedule(@PathVariable String code) throws FlightScheduleNotFoundException {
         String resp = flightService.deleteFlightSchedule(code);
         return new ResponseEntity<>(resp,HttpStatus.NO_CONTENT);

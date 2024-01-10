@@ -1,17 +1,19 @@
 package com.airticket.itc.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class FlightsDTO {
+    @NonNull
     private String flightName;
+    @NonNull
+    private String airlineName;
+    @NonNull
     private int numberOfSeats;
+    @NonNull
     private double fare;
 
 }

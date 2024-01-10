@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,4 +22,5 @@ public class FlightScheduleDTO {
     private double fare;
     private String status;
     private int availableSeat;
+    private List<Integer> availableSeats;
 }

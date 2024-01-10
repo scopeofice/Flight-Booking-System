@@ -30,18 +30,16 @@ const handleRegistrationSubmit = async (e) =>{
 }
   return (
     <div>
-       <fieldset>
-        <legend>Registration</legend>
       <form className='form'>
+        <h2>Registration</h2>
         <input type="text" placeholder='First Name' name="firstName" value={user.firstName} onChange={handleRegistrationChange} /><br />
         <input type="text" placeholder='Last Name' name="lastName" value={user.lastName} onChange={handleRegistrationChange} /><br />
         <input type="text" placeholder='Phone Number' name="phoneNumber" value={user.phoneNumber} onChange={handleRegistrationChange} /><br />
         <input type="text" placeholder='Email' name="email" value={user.email} onChange={handleRegistrationChange} /><br />
         <input type="password" placeholder='Password' name="password" value={user.password} onChange={handleRegistrationChange} /><br />
         <button type='button' onClick={handleRegistrationSubmit}>Register</button><br />
-        <Link className='link' to={"/login"}>Register new user.</Link>
+        <p>Already a user?</p><Link className='link' to={"/login"}>Login</Link>
       </form>
-       </fieldset>
 
     </div>
   )
