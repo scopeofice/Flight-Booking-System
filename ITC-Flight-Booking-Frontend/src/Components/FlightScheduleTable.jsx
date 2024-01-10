@@ -40,7 +40,7 @@ const FlighScheduletTable = () => {
         arrivalTime: "",
         flightName: "",
       });
-      setShow(false);
+      setShow(true);
     } catch (error) {
       console.log(error);
     }
@@ -66,6 +66,7 @@ const FlighScheduletTable = () => {
       }
     };
     setDel(false)
+    setShow(false)
     fetchData();
   }, [show,del]);
 
@@ -93,7 +94,8 @@ const FlighScheduletTable = () => {
         selectedSchedule
       );
       console.log(resp.data);
-      setShow(false);
+      setShow(true);
+      setEditMode(false)
     } catch (error) {
       console.log(error.resp.data);
     }
@@ -112,7 +114,8 @@ const FlighScheduletTable = () => {
 
   return (
     <>
-      <button onClick={handleShowForm}>Add Flight</button>
+    <div style={{ display: "flex", height:"60vh",marginBottom:"20px" }}>
+      {/* <button onClick={handleShowForm}>Add Flight</button> */}
       {show && (
         <div>
           <form>
@@ -225,9 +228,9 @@ const FlighScheduletTable = () => {
       <table className="flight-table">
         <thead>
           <tr>
+            <th>Code</th>
             <th>Source</th>
             <th>Destination</th>
-            <th>Schedule Code</th>
             <th>TravelDate</th>
             <th>PickupTime</th>
             <th>ArrivalTime</th>
@@ -261,6 +264,7 @@ const FlighScheduletTable = () => {
           ))}
         </tbody>
       </table>
+      </div>
     </>
   );
 };
