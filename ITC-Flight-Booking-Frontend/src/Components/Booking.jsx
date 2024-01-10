@@ -94,6 +94,8 @@ export default function Booking() {
     setAcc(e.target.value)
   };
 
+  
+
   return (
     <>
     <div>
@@ -113,7 +115,7 @@ export default function Booking() {
       />
 
       {passengerList.map((passenger, index) => (
-        <div key={index} className="passenger-details">
+        <div key={index} >
           <h2>Passenger {index + 1}</h2>
           <div className="form-group">
             <label>First Name:</label>
@@ -194,7 +196,7 @@ export default function Booking() {
         </div>
       )}
       <div>
-        {true && (
+        {show && (
           <div className="booking-details">
             <h2>Booking Details</h2>
             <p>Source: {bookingDetails.source}</p>

@@ -7,20 +7,89 @@
   .booking-list {
     display: flex;
     flex-direction: column;
-    max-width: 300px;
-    margin: 0 auto;
+    min-width: 300px;
+    margin: 0;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    height: 80vh;
+  }
+
+  .booking-parent{
+    display: flex;
+    
+  }
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .pagination button {
+    padding: 5px;
+    width: 50px;
+    margin: 2px;
+    cursor: pointer;
+    color: black;
+    border: 1px solid green;
+    background-color: #fff;
+  }
+  
+  .pagination button:hover {
+    background-color: green;
+  }
+  
+  .pagination button:disabled {
+    cursor: not-allowed;
+    background-color: #ddd;
+  }
+  
+  .pagination .active {
+    background-color: #4caf50;
+    color: white;
   }
   
   .booking-items {
     list-style-type: none;
     padding: 0;
+    margin: 10px;
     display: flex;
+    width: 100%;
     flex-direction: column;
     align-items: center;
+    overflow: auto;
+
   }
+  .booking-items li{
+    border: #ccc solid 1px;
+    border-radius: 5px;
+    padding: 20px;
+  }
+
+  .flight-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 10px;
+    width: 100%;
+  justify-content: space-between;
+  }
+
+  
+
+  .flight-details,
+  .passenger-details,
+  .payment-details
+  {
+    box-sizing: border-box;
+    width: 48%;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
   
   .booking-details {
     display: flex;
@@ -37,9 +106,28 @@
     margin-bottom: 20px;
   }
   
-  button {
-    margin-top: 10px;
-    padding: 8px 16px;
+ 
+  button.cancel-btn {
+    width: 80px;
+    margin-left: 10px;
+    background-color: red;
+    color: white; /* Text color */
     cursor: pointer;
+    border: none;
+    padding: 8px 10px;
   }
   
+  button.cancel-btn:hover {
+    background-color: darkred;
+  }
+  
+  button.cancel-btn:disabled {
+    background-color: lightgray;
+    cursor: not-allowed;
+  }
+
+  .booking-items-list{
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+  }

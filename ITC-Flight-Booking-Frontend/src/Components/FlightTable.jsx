@@ -104,12 +104,13 @@ const handleClose=()=>{
 
 return (
     <>
-        <button onClick={handleShowForm}>Add Flight</button>
-        {show && (
+        {/* <button onClick={handleShowForm}>Add Flight</button> */}
+        <div style={{display:"flex"}}>
+        {/* {show && ( */}
             <div>
-                <form>
-                    <fieldset>
-                        <legend>{editMode ? 'Edit Flight' : 'Add New Flight'}</legend>
+                <form className='form' style={{margin:"20px"}}>
+                    <>
+                        <h2>{editMode ? 'Edit Flight' : 'Add New Flight'}</h2>
                         <input
                             type="text"
                             name="airlineName"
@@ -146,10 +147,11 @@ return (
                             {editMode ? 'Update' : 'Add'}
                         </button>
                         <button type='button' onClick={handleClose}>Close</button>
-                    </fieldset>
+                    </>
                 </form>
             </div>
-        )}
+        {/* )} */}
+        <div style={{width:"65%"}}>
         <table className="flight-table">
             <thead>
                 <tr>
@@ -175,6 +177,8 @@ return (
                 ))}
             </tbody>
         </table>
+        </div>
+        </div>
     </>
 );
 };

@@ -5,7 +5,7 @@ import axios from "axios";
 
 export default function Home() {
   const [flightsData, setFlightsData] = useState([]);
-  const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")));
+  const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")) || null);
   const [showPNRInfo, setShowPNRInfo] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
   const [pnrResponse, setPnrResponse] = useState({});

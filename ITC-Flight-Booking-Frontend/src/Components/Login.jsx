@@ -25,7 +25,11 @@ export default function Login() {
 
       sessionStorage.setItem("user", JSON.stringify(resp.data));
       if (selectedFlight === '') {
-        nav("/user");
+        if(resp.data.accountInfo.role === 'ROLE_USER'){
+          nav("/user");
+        }else{
+          nav("/admin")
+        }
       } else {
         nav("/booking");
       }

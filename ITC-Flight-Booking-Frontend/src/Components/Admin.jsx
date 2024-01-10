@@ -13,9 +13,8 @@ export default function Admin() {
 
   return (
     <>
-    <div>
-        <fieldset>
-          <legend><h1>Welcome</h1></legend>
+    <div className='user-info'>
+          <h1>Welcome</h1>
           <p>
             <strong>Name:</strong> {userDetails.firstName} {userDetails.lastName}
           </p>
@@ -25,7 +24,6 @@ export default function Admin() {
           <p>
             <strong>Phone Number:</strong> {userDetails.phoneNumber}
           </p>
-        </fieldset>
       </div>
       <div>
       <FlightTable/>
